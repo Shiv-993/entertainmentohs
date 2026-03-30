@@ -11,7 +11,7 @@
 <style>
 :root{--bg:#fff;--bg2:#f8f7f5;--bg3:#f1f0ec;--text:#1a1a18;--text2:#6b6b67;--text3:#9b9b96;--border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.2);--amber:#BA7517;--amber-bg:#FAEEDA;--amber-b:#EF9F27;--blue:#185FA5;--blue-bg:#E6F1FB;--blue-b:#378ADD;--green:#3B6D11;--green-bg:#EAF3DE;--green-b:#639922;--red:#A32D2D;--red-bg:#FCEBEB;--red-b:#E24B4A;--warn:#854F0B;--warn-bg:#FAEEDA;--warn-b:#EF9F27;--r:8px;--rl:12px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(h--bg2);color:var(--text)}
 .shell{max-width:960px;margin:0 auto;padding:0 20px 60px}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .brand{display:flex;align-items:center;gap:12px}
@@ -348,7 +348,7 @@ function DocGen() {
   const build=()=>{
     if(!dept){alert('Please select a department.');return;}
     const vt=tasks.filter(t=>t.title.trim());if(!vt.length){alert('Please add at least one task.');return;}
-    const L=['Please generate a complete '+docType+' for the following:','','**Document type:** '+docType,'**Department:** '+(dd?.name||),'**Company:** '+(form.company||'[Not provided]')+(form.abn?' -- ABN: '+form.abn:''),'**Event:** '+(form.event||'[Not provided]'),'**Venue:** '+(form.venue||'[Not provided]')+(form.address?', '+form.address:''),'**Work dates:** '+(form.dates||'[Not provided]'),'**Jurisdiction:** '+form.juris,'**Site/OHS contact:** '+(form.siteContact||'[Not provided]')+(form.siteRole?', '+form.siteRole:'')+(form.sitePhone?', '+form.sitePhone:''),'**Prepared by:** '+(form.preparedBy||'[Not provided]')+(form.prepRole?' ('+form.prepRole+')':''),'**Nearest hospital:** '+(form.hospital||'[Not provided]'),'**PPE required:** '+(form.ppe||'As per risk assessment'),'**Plant & equipment:** '+(form.plant||'As applicable'),'**Licences required:** '+(form.licences||'Per WHS Schedule 3'),'**Site notes:** '+(form.notes||'Standard venue conditions'),'','**Work tasks:**',...vt.map((t,i)=>`${i+1}. ${t.title}${t.detail?' -- '+t.detail:''}`)];
+    const L=['Please generate a complete '+docType+' for the following:','','**Document type:** '+docType,'**Department:** '+(dd?.name||''),'**Company:** '+(form.company||'[Not provided]')+(form.abn?' -- ABN: '+form.abn:''),'**Event:** '+(form.event||'[Not provided]'),'**Venue:** '+(form.venue||'[Not provided]')+(form.address?', '+form.address:''),'**Work dates:** '+(form.dates||'[Not provided]'),'**Jurisdiction:** '+form.juris,'**Site/OHS contact:** '+(form.siteContact||'[Not provided]')+(form.siteRole?', '+form.siteRole:'')+(form.sitePhone?', '+form.sitePhone:''),'**Prepared by:** '+(form.preparedBy||'[Not provided]')+(form.prepRole?' ('+form.prepRole+')':''),'**Nearest hospital:** '+(form.hospital||'[Not provided]'),'**PPE required:** '+(form.ppe||'As per risk assessment'),'**Plant & equipment:** '+(form.plant||'As applicable'),'**Licences required:** '+(form.licences||'Per WHS Schedule 3'),'**Site notes:** '+(form.notes||'Standard venue conditions'),'','**Work tasks:**',...vt.map((t,i)=>`${i+1}. ${t.title}${t.detail?' -- '+t.detail:''}`)];
     setPrompt(L.join('\n'));setModal(true);
   };
   const copy=()=>{navigator.clipboard.writeText(prompt);setCopied(true);setTimeout(()=>setCopied(false),2000);};
