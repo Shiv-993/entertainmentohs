@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntertainmentOHS</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#fff;--bg2:#f8f7f5;--bg3:#f1f0ec;--text:#1a1a18;--text2:#6b6b67;--text3:#9b9b96;--border:rgba(0,0,0,.1);--border2:rgba(0,0,0,.2);--amber:#BA7517;--amber-bg:#FAEEDA;--amber-b:#EF9F27;--blue:#185FA5;--blue-bg:#E6F1FB;--blue-b:#378ADD;--green:#3B6D11;--green-bg:#EAF3DE;--green-b:#639922;--red:#A32D2D;--red-bg:#FCEBEB;--red-b:#E24B4A;--warn:#854F0B;--warn-bg:#FAEEDA;--warn-b:#EF9F27;--r:8px;--rl:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text)}
+.shell{max-width:960px;margin:0 auto;padding:0 20px 60px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-ico{width:40px;height:40px;border-radius:8px;background:#FAEEDA;border:1px solid #EF9F27;display:flex;align-items:center;justify-content:center;font-size:20px}
+.brand-name{font-size:17px;font-weight:600}.brand-sub{font-size:12px;color:#6b6b67}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vpill{font-size:10px;padding:3px 10px;border-radius:20px;background:#EAF3DE;color:#3B6D11;border:1px solid #639922;font-weight:600}
+.co-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:#E6F1FB;color:#185FA5;border:1px solid #378ADD;font-weight:500}
+.save-flash{font-size:11px;color:#3B6D11;font-weight:500}
+.btn-out{padding:6px 12px;border:1px solid rgba(0,0,0,.2);border-radius:8px;background:transparent;color:#6b6b67;font-size:12px;cursor:pointer;font-family:inherit}
+.nav{display:flex;gap:2px;background:#f1f0ec;border-radius:12px;padding:4px;border:1px solid rgba(0,0,0,.1);margin-bottom:20px;overflow-x:auto}
+.nb{flex:1;min-width:max-content;padding:8px 10px;border:none;border-radius:8px;background:transparent;font-size:12px;font-weight:500;color:#6b6b67;cursor:pointer;font-family:inherit;white-space:nowrap}
+.nb.on{background:#fff;color:#1a1a18;border:1px solid rgba(0,0,0,.1)}
+.card{background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:18px 22px;margin-bottom:12px}
+.ctitle{font-size:11px;font-weight:600;color:#6b6b67;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.crow{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.crow .ctitle{margin-bottom:0}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid rgba(0,0,0,.2);border-radius:8px;background:#f8f7f5;color:#1a1a18;font-size:13px;font-family:inherit;box-sizing:border-box}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#EF9F27}
+textarea{resize:vertical;min-height:64px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.fg{margin-bottom:10px}
+.fl{font-size:11px;font-weight:600;color:#6b6b67;display:block;margin-bottom:5px}
+.pbtn{width:100%;padding:12px;border-radius:8px;border:none;background:#1a1a18;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.pbtn:disabled{opacity:.35;cursor:not-allowed}
+.sbtn{padding:7px 13px;border:1px solid rgba(0,0,0,.2);border-radius:8px;background:transparent;color:#1a1a18;font-size:12px;cursor:pointer;font-family:inherit}
+.sbtn.blue{border-color:#378ADD;color:#185FA5}.sbtn.blue:hover{background:#E6F1FB}
+.sbtn.red{border-color:#E24B4A;color:#A32D2D}.sbtn.red:hover{background:#FCEBEB}
+.sbtn.warn{border-color:#EF9F27;color:#854F0B}.sbtn.warn:hover{background:#FAEEDA}
+.info{padding:12px 16px;border-radius:8px;margin-bottom:12px;font-size:12px;line-height:1.65}
+.info.blue{background:#E6F1FB;border:1px solid #378ADD;color:#185FA5}
+.info.amber{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.info.green{background:#EAF3DE;border:1px solid #639922;color:#3B6D11}
+.info.red{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:7px;margin-bottom:12px}
+.db{padding:12px 8px 10px;border:1px solid rgba(0,0,0,.1);border-radius:8px;background:#f8f7f5;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.db.on{border:2px solid #EF9F27;background:#FAEEDA}
+.db .di{font-size:18px;line-height:1}.db .dn{font-size:12px;font-weight:600}.db.on .dn{color:#BA7517}.db .ds{font-size:10px;color:#6b6b67;line-height:1.3}
+.finding{padding:12px 14px;border-radius:8px;margin-bottom:8px;border-left:3px solid}
+.finding.critical{background:#FCEBEB;border-color:#A32D2D}.finding.warning{background:#FAEEDA;border-color:#854F0B}.finding.pass{background:#EAF3DE;border-color:#3B6D11}
+.ftag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:6px}
+.finding.critical .ftag{background:#FCEBEB;color:#A32D2D;border:1px solid #E24B4A}
+.finding.warning .ftag{background:#FAEEDA;color:#854F0B;border:1px solid #EF9F27}
+.finding.pass .ftag{background:#EAF3DE;color:#3B6D11;border:1px solid #639922}
+.sc{background:#f8f7f5;border-radius:8px;padding:12px 14px}.sl{font-size:11px;color:#6b6b67;margin-bottom:4px}.sv{font-size:24px;font-weight:700}
+.sv.good{color:#3B6D11}.sv.warn{color:#854F0B}.sv.bad{color:#A32D2D}
+.auth-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f8f7f5;padding:20px}
+.auth-card{background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:36px 40px;width:100%;max-width:440px}
+.auth-tabs{display:flex;gap:2px;background:#f8f7f5;border-radius:8px;padding:3px;border:1px solid rgba(0,0,0,.1);margin-bottom:22px}
+.auth-tab{flex:1;padding:8px;border:none;border-radius:6px;background:transparent;font-size:13px;font-weight:500;color:#6b6b67;cursor:pointer;font-family:inherit}
+.auth-tab.on{background:#fff;color:#1a1a18;border:1px solid rgba(0,0,0,.1)}
+.inc-card{padding:12px 14px;border-radius:8px;margin-bottom:8px;border-left:3px solid;cursor:pointer}
+.inc-card.incident{border-color:#A32D2D;background:#fff}.inc-card.nearmiss{border-color:#EF9F27;background:#fff}
+.itag{display:inline-flex;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.itag.incident{background:#FCEBEB;color:#A32D2D;border:1px solid #E24B4A}
+.itag.nearmiss{background:#FAEEDA;color:#854F0B;border:1px solid #EF9F27}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:12px;padding:24px;max-width:680px;width:100%}
+.lbar{height:3px;background:#f1f0ec;border-radius:3px;overflow:hidden;margin-bottom:8px}
+.lfill{height:100%;background:#BA7517;border-radius:3px;animation:sw 1.8s ease-in-out infinite}
+@keyframes sw{0%{width:0%;margin-left:0}50%{width:55%;margin-left:22%}100%{width:0%;margin-left:100%}}
+.stat-card{background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:12px;padding:20px;text-align:center}
+.stat-num{font-size:36px;font-weight:700;margin:8px 0 4px}.stat-lbl{font-size:12px;color:#6b6b67}
+.wa-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f8f7f5;border-radius:8px;border:1px solid rgba(0,0,0,.1)}
+.wa-code{font-size:10px;font-weight:700;min-width:48px;color:#185FA5}
+.task-row{display:grid;grid-template-columns:26px 1fr 24px;gap:10px;align-items:flex-start;margin-bottom:9px;background:#f8f7f5;border:1px solid rgba(0,0,0,.1);border-radius:8px;padding:11px 12px}
+.task-num{width:24px;height:24px;border-radius:50%;background:#1a1a18;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;margin-top:3px;flex-shrink:0}
+@media(max-width:640px){.g2,.g3{grid-template-columns:1fr}.g4{grid-template-columns:repeat(2,1fr)}.auth-card{padding:24px 16px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {createClient} = supabase;
+const {useState,useEffect,useContext,createContext} = React;
+const SURL='https://kvgaywdvponzskxpwdpx.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Z2F5d2R2cG9uenNreHB3ZHB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1ODA3MDIsImV4cCI6MjA5MDE1NjcwMn0.Jh01GLgCHMbZDcTf6fAYSzpl-kHz0Ki1-Qx_O5OiM-o';
+const db=createClient(SURL,SKEY);
+const Ctx=createContext(null);
+const useApp=()=>useContext(Ctx);
+
+const DEPTS=[
+  {id:'theatre',icon:'🎭',name:'Theatre',sub:'Stage mgmt, production',tags:['Fly floor ops','Automated staging','Pyrotechnics','Performer safety'],refs:['WA Events Guidelines 2022 — S4, S6, S7','WHS Act 2020 (WA)','AS 3745-2010']},
+  {id:'lighting',icon:'💡',name:'Lighting',sub:'LX, followspot, control',tags:['LOTO / isolation','Temporary electrical','Working at heights','UV & blue-light'],refs:['WA Events Guidelines 2022 — G36, G37','AS/NZS 3000:2018','AS/NZS IEC 62471']},
+  {id:'audio',icon:'🎚',name:'Audio',sub:'FOH, monitors, RF',tags:['Hearing conservation','Noise limits (dB)','Line array rigging','Manual handling'],refs:['WA Events Guidelines 2022 — G29','AS/NZS 1269 series','AS 1418.3']},
+  {id:'staging',icon:'🏗',name:'Staging',sub:'Stage, deck, platforms',tags:['Structural loads','Deck assembly','Edge protection','Fall prevention'],refs:['WA Events Guidelines 2022 — G11, G12, G20','AS 1170 series','AS 1418.10']},
+  {id:'rigging',icon:'⛓',name:'Rigging',sub:'Fly, motors, truss',tags:['Point load calcs','Chain motors','Truss inspection','SWL markings'],refs:['AS 1418.1 / 1418.2','ESTA ANSI E1.6-1','WHS Act 2020 (WA) Schedule 3']},
+  {id:'site',icon:'🏕',name:'Site',sub:'Outdoor, festival, bump',tags:['Temp structures','Wind management','Traffic plan','Ground loading'],refs:['WA Events Guidelines 2022 — S4-S7, G31','AS 1170.2:2021','Health (Public Buildings) Regs 1992 (WA)']},
+  {id:'power',icon:'⚡',name:'Power',sub:'Distro, genset, cabling',tags:['Licensed electrician','Temporary distro','Earthing & bonding','RCD compliance'],refs:['WA Events Guidelines 2022 — G36','AS/NZS 3000:2018','AS/NZS 3012:2019']},
+];
+
+const FINDINGS={
+  lighting:[{t:'critical',h:'LOTO / isolation procedure absent',d:'Fixture maintenance at height does not reference a lockout/tagout procedure. WA Events Guidelines G36 requires isolation before any live electrical work.',r:'WA Events Guidelines 2022 — G36; AS/NZS 4836:2011'},{t:'critical',h:'Temporary LX installation inspection not specified',d:'No requirement for pre-event inspection by a licensed electrician per AS/NZS 3000 and WA Events Guidelines G36.',r:'WA Events Guidelines 2022 — G36, G37; AS/NZS 3000:2018'},{t:'warning',h:'Working at heights rescue plan absent',d:'SOP identifies heights work but has no rescue plan for a suspended person.',r:'WHS (General) Regs 2022 (WA) Reg 80'},{t:'warning',h:'Photobiological safety assessment missing',d:'High-output LED moving lights not assessed for UV/blue-light hazard per AS/NZS IEC 62471.',r:'AS/NZS IEC 62471:2011; WA Events Guidelines 2022 — G37'},{t:'pass',h:'Cable management controls documented',d:'Cable routing, protection matting, and anti-trip measures documented.',r:null},{t:'pass',h:'RCD protection specified',d:'RCD protection on all LX circuits with test frequency documented.',r:null}],
+  rigging:[{t:'critical',h:'Point load calculations absent',d:'SWMS references hanging positions without structural engineering point load calculations.',r:'AS 1418.1; ESTA ANSI E1.6-1; WHS Act 2020 (WA) s.19'},{t:'critical',h:'Rigging licence requirements not specified',d:'Tasks listed without specifying required WHS licences per Schedule 3.',r:'WHS (General) Regs 2022 (WA) Schedule 3'},{t:'critical',h:'Pre-use inspection checklist not referenced',d:'Chain motors, shackles, and slings must have documented pre-use inspection.',r:'AS 1418.2; AS 2741; AS 3569'},{t:'warning',h:'SWL verification not documented',d:'SWMS does not include SWL marking verification as a required step.',r:'WHS (General) Regs 2022 (WA) Reg 216'},{t:'pass',h:'Ground exclusion zones documented',d:'Exclusion zones beneath all rigging operations defined.',r:null},{t:'pass',h:'Load path documentation present',d:'Primary and secondary load paths documented with redundancy noted.',r:null}],
+  power:[{t:'critical',h:'Licensed electrician sign-off not specified',d:'Temporary power installation described without requiring a licensed electrical contractor — mandatory under AS/NZS 3000:2018 and WA Events Guidelines G36.',r:'WA Events Guidelines 2022 — G36; AS/NZS 3000:2018'},{t:'critical',h:'Earthing & bonding not documented',d:'SWMS does not address earthing and equipotential bonding — critical under AS/NZS 3000:2018 Clause 5.4.',r:'AS/NZS 3000:2018 Cl. 5.4; AS/NZS 3012:2019'},{t:'warning',h:'Generator refuelling procedure absent',d:'No cool-down refuelling procedure or spill containment documented.',r:'WHS (General) Regs 2022 (WA) Reg 357; AS 1940'},{t:'warning',h:'Cable route protection plan missing',d:'Temporary cables across pedestrian areas not identified with protection methods.',r:'AS/NZS 3000:2018 Cl. 3.9; WA Events Guidelines 2022 — G36'},{t:'pass',h:'RCD protection on all circuits confirmed',d:'All distribution boards documented with RCD on every circuit.',r:null},{t:'pass',h:'LOTO procedure referenced',d:'Site electrical isolation and LOTO referenced for maintenance tasks.',r:null}],
+  staging:[{t:'critical',h:'Structural engineering sign-off absent',d:'Stage deck assembly described without engineering certification required by WA Events Guidelines G11-G12.',r:'WA Events Guidelines 2022 — G11, G12; AS 1170 series'},{t:'warning',h:'Deck edge protection not documented',d:'Stage deck perimeter edge protection type and installation standard not specified.',r:'WHS (General) Regs 2022 (WA) Reg 78; AS 1657'},{t:'warning',h:'EWP pre-start checklist not referenced',d:'EWP operations identified but no pre-start checklist reference found.',r:'AS 1418.10'},{t:'pass',h:'Exclusion zone during bump-in documented',d:'Exclusion zone during deck and structure assembly documented.',r:null},{t:'pass',h:'Manual handling controls documented',d:'Two-person lift requirements documented for stage deck panel handling.',r:null}],
+  site:[{t:'critical',h:'Temporary structure engineering certification missing',d:'Stage and roof structure referenced without engineering sign-off.',r:'WA Events Guidelines 2022 — G11, G12, G14; Health (Public Buildings) Regs 1992 (WA)'},{t:'critical',h:'Wind management plan absent',d:'No wind action plan with defined suspension or evacuation trigger speeds.',r:'WA Events Guidelines 2022 — G28; AS 1170.2:2021'},{t:'warning',h:'Event registration not referenced',d:'Expected attendance exceeds 500 patrons. Registration with WA Dept of Health required.',r:'WA Events Guidelines 2022 — Background'},{t:'warning',h:'Traffic management plan not event-specific',d:'Generic venue traffic plan referenced. WA Events Guidelines G31 requires event-specific plans.',r:'WA Events Guidelines 2022 — G31; MUTCD'},{t:'pass',h:'First aid provisions documented',d:'First aider ratios and post locations documented per WA Events Guidelines G7.',r:null},{t:'pass',h:'Essential services coordination documented',d:'Liaison points for fire, ambulance and security documented.',r:null}],
+  audio:[{t:'critical',h:'Hearing conservation program absent',d:'No hearing conservation program, audiometric testing schedule, or dB action levels referenced.',r:'WA Events Guidelines 2022 — G29; AS/NZS 1269.3'},{t:'warning',h:'Line array rigging load verification absent',d:'Speaker hang procedures do not reference structural engineering sign-off.',r:'AS 1418.3; WHS Act 2020 (WA) s.19'},{t:'warning',h:'Manual handling controls absent',d:'Speaker elements exceed 20kg with no two-person controls documented.',r:'WHS (General) Regs 2022 (WA) Reg 60'},{t:'pass',h:'RF safety controls in place',d:'Safe working distances from IEM transmitters documented.',r:null},{t:'pass',h:'Noise impact assessment referenced',d:'External noise impact and venue noise limit compliance referenced.',r:null}],
+  theatre:[{t:'critical',h:'Fly floor exclusion zone not documented',d:'SWMS does not define an exclusion zone beneath flying pieces.',r:'WA Events Guidelines 2022 — G18, G20; WHS Act 2020 (WA) s.19'},{t:'critical',h:'Automated staging competency unspecified',d:'Document references automated wagons without specifying operator competency.',r:'WHS Act 2020 (WA) s.19; AS 4024 series'},{t:'warning',h:'Pyrotechnic storage & safe distances absent',d:'SWMS does not address storage or minimum safe distances per WA Events Guidelines G30.',r:'WA Events Guidelines 2022 — G30; AS 2187.2'},{t:'warning',h:'Emergency egress not show-specific',d:'Generic venue exits referenced without accounting for scenic elements.',r:'WA Events Guidelines 2022 — G5, G21; AS 3745-2010'},{t:'pass',h:'Pre-show safety briefing documented',d:'Daily performer and crew safety briefings with sign-off protocol documented.',r:null},{t:'pass',h:'Prop manual handling controls in place',d:'Two-person lift and mechanical assist requirements documented.',r:null}],
+};
+
+const WA_G=[
+  {code:'G1-G3',name:'Venue suitability & event rating'},{code:'G4',name:'Risk management'},
+  {code:'G5',name:'Emergency management'},{code:'G6',name:'Counter-terrorism'},
+  {code:'G7',name:'Medical and first aid'},{code:'G8',name:'Infection control'},
+  {code:'G9-G14',name:'Public building approvals & structures'},{code:'G15-G17',name:'Event operational procedures'},
+  {code:'G18-G21',name:'Crowd management'},{code:'G28',name:'Lightning risk'},
+  {code:'G29',name:'Noise management'},{code:'G30',name:'Lasers & pyrotechnics'},
+  {code:'G36',name:'Electrical installations'},{code:'G37',name:'Event lighting'},
+  {code:'Tool 7',name:'Temporary structures checklist'},{code:'Tool 12',name:'Stage barrier design'},
+];
+
+const SEV={nearmiss:'Near miss',minor:'Minor — first aid',moderate:'Moderate — medical',serious:'Serious — hospitalisation',critical:'Critical — death/disability',dangerous:'Dangerous incident'};
+
+function Auth({onSuccess}) {
+  const [tab,setTab]=useState('login');
+  const [email,setEmail]=useState('');const [pw,setPw]=useState('');
+  const [co,setCo]=useState('');const [name,setName]=useState('');const [pw2,setPw2]=useState('');
+  const [loading,setLoading]=useState(false);const [msg,setMsg]=useState({t:'',c:''});
+  const sm=(t,c)=>setMsg({t,c});
+
+  const login=async()=>{
+    if(!email||!pw){sm('Please enter email and password.','red');return;}
+    setLoading(true);
+    const {data,error}=await db.auth.signInWithPassword({email,password:pw});
+    setLoading(false);
+    if(error){sm(error.message,'red');return;}
+    onSuccess(data.user);
+  };
+
+  const register=async()=>{
+    if(!co||!name||!email||!pw){sm('Please fill in all fields.','red');return;}
+    if(pw!==pw2){sm('Passwords do not match.','red');return;}
+    if(pw.length<8){sm('Password must be at least 8 characters.','red');return;}
+    setLoading(true);
+    const {data,error}=await db.auth.signUp({email,password:pw,options:{data:{company_name:co,full_name:name}}});
+    setLoading(false);
+    if(error){sm(error.message,'red');return;}
+    if(data.user&&data.session){onSuccess(data.user);}
+    else{sm('Account created! Check your email to confirm, then sign in.','green');setTab('login');}
+  };
+
+  return(
+    <div className="auth-shell">
+      <div className="auth-card">
+        <div className="brand" style={{marginBottom:28}}><div className="brand-ico">🎭</div><div><div className="brand-name">EntertainmentOHS</div><div className="brand-sub">Live events compliance platform</div></div></div>
+        <div className="auth-tabs">
+          <button className={'auth-tab'+(tab==='login'?' on':'')} onClick={()=>{setTab('login');setMsg({t:'',c:''});}}>Sign in</button>
+          <button className={'auth-tab'+(tab==='register'?' on':'')} onClick={()=>{setTab('register');setMsg({t:'',c:''});}}>Create account</button>
+        </div>
+        {tab==='login'&&<>
+          <div className="fg"><label className="fl">Email</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com" onKeyDown={e=>e.key==='Enter'&&login()}/></div>
+          <div className="fg"><label className="fl">Password</label><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Password" onKeyDown={e=>e.key==='Enter'&&login()}/></div>
+          <button className="pbtn" onClick={login} disabled={loading} style={{marginTop:6}}>{loading?'Signing in...':'Sign in'}</button>
+        </>}
+        {tab==='register'&&<>
+          <div className="fg"><label className="fl">Company / business name</label><input type="text" value={co} onChange={e=>setCo(e.target.value)} placeholder="e.g. Showscreens"/></div>
+          <div className="fg"><label className="fl">Your name</label><input type="text" value={name} onChange={e=>setName(e.target.value)} placeholder="Full name"/></div>
+          <div className="fg"><label className="fl">Email</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@company.com"/></div>
+          <div className="g2" style={{marginBottom:0}}>
+            <div className="fg"><label className="fl">Password</label><input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Min. 8 characters"/></div>
+            <div className="fg"><label className="fl">Confirm password</label><input type="password" value={pw2} onChange={e=>setPw2(e.target.value)} placeholder="Repeat password"/></div>
+          </div>
+          <button className="pbtn" onClick={register} disabled={loading} style={{marginTop:6}}>{loading?'Creating account...':'Create account'}</button>
+        </>}
+        {msg.t&&<div className={'info '+msg.c} style={{marginTop:14,marginBottom:0}}>{msg.t}</div>}
+        <div style={{marginTop:18,textAlign:'center',fontSize:11,color:'#9b9b96'}}>Protected by row-level security &middot; Each company sees only their own data</div>
+      </div>
+    </div>
+  );
+}
+
+function Dashboard() {
+  const {incidents,compHistory,userMeta}=useApp();
+  const name=userMeta?.full_name||'';const co=userMeta?.company_name||'';
+  const tI=incidents.filter(i=>i.type==='incident').length;
+  const tN=incidents.filter(i=>i.type==='nearmiss').length;
+  const tA=incidents.filter(i=>i.actions&&i.actions.trim()).length;
+  const tNotif=incidents.filter(i=>['serious','critical','dangerous'].includes(i.severity)).length;
+  const avg=compHistory.length?Math.round(compHistory.reduce((a,r)=>a+(r.score||0),0)/compHistory.length):null;
+  return(
+    <div>
+      <div className="card" style={{borderLeft:'4px solid #BA7517',marginBottom:12}}>
+        <div style={{fontSize:18,fontWeight:600,marginBottom:3}}>Welcome back{name?`, ${name.split(' ')[0]}`:''}</div>
+        <div style={{fontSize:13,color:'#6b6b67'}}>{co} &middot; EntertainmentOHS Live Events Compliance Platform</div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,marginBottom:12}}>
+        <div className="stat-card"><div className="stat-lbl">Total incidents</div><div className="stat-num" style={{color:'#A32D2D'}}>{tI}</div></div>
+        <div className="stat-card"><div className="stat-lbl">Near misses</div><div className="stat-num" style={{color:'#854F0B'}}>{tN}</div></div>
+        <div className="stat-card"><div className="stat-lbl">Actions required</div><div className="stat-num" style={{color:'#185FA5'}}>{tA}</div></div>
+        <div className="stat-card"><div className="stat-lbl">Notifiable</div><div className="stat-num" style={{color:tNotif>0?'#A32D2D':'#3B6D11'}}>{tNotif}</div></div>
+        <div className="stat-card"><div className="stat-lbl">Analyses run</div><div className="stat-num">{compHistory.length}</div></div>
+        <div className="stat-card"><div className="stat-lbl">Avg score</div><div className="stat-num" style={{color:avg>=80?'#3B6D11':avg>=55?'#854F0B':'#A32D2D'}}>{avg!==null?avg+'%':'--'}</div></div>
+      </div>
+      {incidents.length>0&&<div className="card"><div className="ctitle">Recent incidents</div>{incidents.slice(0,5).map(inc=>(
+        <div key={inc.id} className={'inc-card '+inc.type}>
+          <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4,flexWrap:'wrap'}}>
+            <span className={'itag '+inc.type}>{inc.type==='incident'?'🔴 Incident':'⚠️ Near miss'}</span>
+            <span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#f8f7f5',color:'#6b6b67',border:'1px solid rgba(0,0,0,.1)',fontWeight:600}}>{SEV[inc.severity]||inc.severity}</span>
+            <span style={{fontSize:11,color:'#9b9b96',marginLeft:'auto'}}>{inc.date}</span>
+          </div>
+          <div style={{fontSize:12,fontWeight:600}}>{inc.desc?.slice(0,90)}{(inc.desc?.length||0)>90?'...':''}</div>
+          <div style={{fontSize:11,color:'#6b6b67',marginTop:3}}>{inc.dept&&inc.dept+' . '}{inc.venue&&'📍 '+inc.venue}</div>
+        </div>
+      ))}</div>}
+      {incidents.length===0&&compHistory.length===0&&<div className="card" style={{textAlign:'center',padding:'2.5rem 1rem'}}>
+        <div style={{fontSize:32,marginBottom:12}}>🎭</div>
+        <div style={{fontSize:14,fontWeight:600,marginBottom:6}}>Welcome to EntertainmentOHS</div>
+        <div style={{fontSize:13,color:'#6b6b67',maxWidth:420,margin:'0 auto',lineHeight:1.7}}>Get started by running a compliance analysis, generating an OHS document, or logging your first incident. Everything saves automatically to your company account.</div>
+      </div>}
+    </div>
+  );
+}
+
+function Analyse() {
+  const {saveCompliance}=useApp();
+  const [dept,setDept]=useState(null);const [docType,setDocType]=useState(null);const [state,setState]=useState('Queensland');
+  const [files,setFiles]=useState([]);const [loading,setLoading]=useState(false);const [step,setStep]=useState(0);const [results,setResults]=useState(null);
+  const MSGS=['Parsing document...','Loading WA Events Guidelines 2022...','Mapping department requirements...','Checking legislation...','Evaluating controls...','Compiling findings...'];
+  const STATES=['Queensland','New South Wales','Victoria','Western Australia','South Australia','Tasmania','ACT','Northern Territory'];
+  const DOCS=['SWMS','JHA/JSA','Risk Assessment','SOP','Emergency Plan'];
+  const dd=DEPTS.find(d=>d.id===dept);
+
+  const run=async()=>{
+    if(!dept||!docType||!files.length)return;
+    setLoading(true);setResults(null);let s=0;
+    const t=setInterval(()=>{s=Math.min(s+1,MSGS.length-1);setStep(s);},700);
+    await new Promise(r=>setTimeout(r,4500));clearInterval(t);
+    const data=FINDINGS[dept]||FINDINGS.lighting;
+    const cr=data.filter(f=>f.t==='critical').length;const wa=data.filter(f=>f.t==='warning').length;const pa=data.filter(f=>f.t==='pass').length;
+    const score=Math.round(pa/data.length*100);
+    setResults({dept,docType,state,score,cr,wa,pa,findings:data});setLoading(false);
+    await saveCompliance({department:dd?.name,doc_type:docType,jurisdiction:state,score,critical_count:cr,warning_count:wa,pass_count:pa,findings:data});
+  };
+
+  return(
+    <div>
+      <div className="card">
+        <div className="ctitle">Department</div>
+        <div className="dg">{DEPTS.map(d=><button key={d.id} className={'db'+(dept===d.id?' on':'')} onClick={()=>setDept(d.id)}><span className="di">{d.icon}</span><span className="dn">{d.name}</span><span className="ds">{d.sub}</span></button>)}</div>
+        {dept&&dd&&<div style={{marginTop:10,padding:'12px 16px',background:'#f8f7f5',borderRadius:8,borderLeft:'3px solid #EF9F27'}}>
+          <div style={{fontSize:12,fontWeight:600,marginBottom:6}}>{dd.name} -- AI analysis context</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:4,marginBottom:6}}>{dd.tags.map(t=><span key={t} style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#fff',border:'1px solid rgba(0,0,0,.1)',color:'#6b6b67'}}>{t}</span>)}</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:4}}>{dd.refs.map(r=><span key={r} style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#E6F1FB',border:'1px solid #378ADD',color:'#185FA5'}}>{r}</span>)}</div>
+        </div>}
+      </div>
+      <div className="g2">
+        <div className="card"><div className="ctitle">Document type</div><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(90px,1fr))',gap:6}}>{DOCS.map(d=><button key={d} onClick={()=>setDocType(d)} style={{padding:'7px 10px',border:`${docType===d?'2px solid #378ADD':'1px solid rgba(0,0,0,.1)'}`,borderRadius:8,background:docType===d?'#E6F1FB':'#f8f7f5',cursor:'pointer',fontSize:12,fontWeight:500,color:docType===d?'#185FA5':'#1a1a18',textAlign:'center'}}>{d}</button>)}</div></div>
+        <div className="card"><div className="ctitle">Jurisdiction</div><select value={state} onChange={e=>setState(e.target.value)}>{STATES.map(s=><option key={s}>{s}</option>)}</select></div>
+      </div>
+      <div className="card">
+        <div className="ctitle">Upload documents</div>
+        <div style={{border:'2px dashed rgba(0,0,0,.2)',borderRadius:12,padding:'1.5rem',textAlign:'center',background:'#f8f7f5',cursor:'pointer'}} onClick={()=>document.getElementById('fi').click()}>
+          <div style={{fontSize:18,marginBottom:8}}>📄</div>
+          <div style={{fontSize:14,fontWeight:500,marginBottom:4}}>Drop files here or click to browse</div>
+          <div style={{fontSize:12,color:'#6b6b67'}}>PDF, DOCX, DOC</div>
+        </div>
+        <input type="file" id="fi" style={{display:'none'}} multiple accept=".pdf,.doc,.docx" onChange={e=>setFiles(prev=>[...prev,...Array.from(e.target.files)])}/>
+        {files.map((f,i)=><div key={i} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 12px',background:'#fff',border:'1px solid rgba(0,0,0,.1)',borderRadius:8,marginTop:6}}><span>📄</span><span style={{flex:1,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{f.name}</span><button onClick={()=>setFiles(prev=>prev.filter((_,j)=>j!==i))} style={{background:'none',border:'none',cursor:'pointer',color:'#9b9b96',fontSize:14}}>x</button></div>)}
+        {loading&&<div style={{marginTop:12}}><div className="lbar"><div className="lfill"/></div><div style={{fontSize:12,color:'#6b6b67',textAlign:'center'}}>{MSGS[step]}</div></div>}
+        <button className="pbtn" style={{marginTop:12}} onClick={run} disabled={!dept||!docType||!files.length||loading}>{loading?'Analysing...':'Analyse for compliance'}</button>
+      </div>
+      {results&&<>
+        <div className="card">
+          <div className="ctitle">{DEPTS.find(d=>d.id===results.dept)?.name} dept -- {results.docType} -- {results.state}</div>
+          <div className="g4">
+            <div className="sc"><div className="sl">Overall score</div><div className={'sv '+(results.score>=80?'good':results.score>=55?'warn':'bad')}>{results.score}%</div></div>
+            <div className="sc"><div className="sl">Critical gaps</div><div className="sv bad">{results.cr}</div></div>
+            <div className="sc"><div className="sl">Warnings</div><div className="sv warn">{results.wa}</div></div>
+            <div className="sc"><div className="sl">Passed</div><div className="sv good">{results.pa}</div></div>
+          </div>
+        </div>
+        <div className="card"><div className="ctitle">Findings</div>{results.findings.map((f,i)=>(
+          <div key={i} className={'finding '+f.t}>
+            <div style={{display:'flex',alignItems:'flex-start',gap:6,marginBottom:4,flexWrap:'wrap'}}><span className="ftag">{f.t==='critical'?'Critical':f.t==='warning'?'Warning':'Pass'}</span><span style={{fontSize:13,fontWeight:600}}>{f.h}</span></div>
+            <div style={{fontSize:12,color:'#6b6b67',lineHeight:1.6}}>{f.d}</div>
+            {f.r&&<div style={{fontSize:11,color:'#9b9b96',marginTop:4,fontStyle:'italic'}}>Ref: {f.r}</div>}
+          </div>
+        ))}</div>
+      </>}
+    </div>
+  );
+}
+
+function Regs() {
+  const {customRegs,saveRegSource}=useApp();
+  const [newSrc,setNewSrc]=useState('');const [checking,setChecking]=useState(false);
+  const BASE=[{name:'WA Events Guidelines 2022',juris:'WA',ver:'2022 ed.',status:'current',url:'https://www.health.wa.gov.au/Articles/F_I/Guideline-for-concerts-events-and-organised-gatherings'},{name:'Work Health and Safety Act 2020 (WA)',juris:'WA',ver:'No. 36 of 2020',status:'current',url:''},{name:'WHS (General) Regulations 2022 (WA)',juris:'WA',ver:'2022',status:'current',url:''},{name:'Work Health and Safety Act 2011 (Qld)',juris:'QLD',ver:'2011 (amended)',status:'current',url:''},{name:'AS/NZS 3000:2018 Wiring Rules',juris:'AU/NZ',ver:'2018',status:'current',url:''},{name:'AS 1418 series',juris:'AU',ver:'Various',status:'current',url:''},{name:'AS/NZS 1269 series -- Occupational Noise',juris:'AU/NZ',ver:'2005 (confirmed 2016)',status:'current',url:''},{name:'AS 1170.2:2021 -- Wind Actions',juris:'AU',ver:'2021',status:'current',url:''},{name:'Model WHS Act (Safe Work Australia)',juris:'National',ver:'Dec 2025 ed.',status:'current',url:''},{name:'ESTA ANSI E1.6-1',juris:'International',ver:'Current',status:'current',url:''}];
+  const all=[...BASE,...(customRegs||[]).map(r=>({name:r.name,juris:r.jurisdiction,ver:r.version,status:r.status,url:r.url||''}))];
+  const check=()=>{setChecking(true);setTimeout(()=>setChecking(false),2500);};
+  const add=async()=>{if(!newSrc.trim())return;await saveRegSource({name:newSrc.trim(),juris:'AU',ver:'2024 ed.',st:'current',url:newSrc.startsWith('http')?newSrc:'',note:''});setNewSrc('');};
+  return(
+    <div>
+      <div className="info blue"><strong>WA legislation reform -- March 2022:</strong> Western Australia replaced the OSH Act 1984 with the <strong>Work Health and Safety Act 2020 (WA)</strong>, which commenced 31 March 2022.</div>
+      <div className="card">
+        <div className="crow"><div className="ctitle">Regulation & standards hub</div><button className="sbtn blue" onClick={check} disabled={checking}>{checking?'Checking...':'Check for updates'}</button></div>
+        <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
+          <thead><tr>{['Source','Jurisdiction','Version','Status'].map(h=><th key={h} style={{fontSize:11,fontWeight:600,color:'#6b6b67',textAlign:'left',padding:'8px 12px',borderBottom:'1px solid rgba(0,0,0,.1)',background:'#f8f7f5'}}>{h}</th>)}</tr></thead>
+          <tbody>{all.map((r,i)=><tr key={i}>
+            <td style={{fontSize:12,padding:'10px 12px',borderBottom:'1px solid rgba(0,0,0,.1)'}}><strong style={{fontWeight:600}}>{r.name}</strong>{r.url&&<a href={r.url} target="_blank" rel="noopener noreferrer" style={{color:'#185FA5',fontSize:10,marginLeft:6}}>link</a>}</td>
+            <td style={{fontSize:11,color:'#6b6b67',padding:'10px 12px',borderBottom:'1px solid rgba(0,0,0,.1)'}}>{r.juris}</td>
+            <td style={{fontSize:11,color:'#6b6b67',padding:'10px 12px',borderBottom:'1px solid rgba(0,0,0,.1)'}}>{r.ver}</td>
+            <td style={{padding:'10px 12px',borderBottom:'1px solid rgba(0,0,0,.1)'}}><span style={{width:8,height:8,borderRadius:'50%',background:'#3B6D11',display:'inline-block',marginRight:5}}/><span style={{fontSize:11,color:'#6b6b67'}}>Current</span></td>
+          </tr>)}</tbody>
+        </table></div>
+      </div>
+      <div className="card"><div className="ctitle">WA Events Guidelines 2022 -- active sections</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>{WA_G.map(g=><div key={g.code} className="wa-item"><span className="wa-code">{g.code}</span><span style={{fontSize:12}}>{g.name}</span></div>)}</div>
+      </div>
+      <div className="card"><div className="ctitle">Add a regulation source</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:10,alignItems:'end'}}>
+          <div><label className="fl">URL or legislation / standard reference</label><input type="text" value={newSrc} onChange={e=>setNewSrc(e.target.value)} placeholder="e.g. https://www.legislation.gov.au/... or AS 2187.2:2006" onKeyDown={e=>e.key==='Enter'&&add()}/></div>
+          <button className="sbtn blue" onClick={add} style={{whiteSpace:'nowrap',padding:'9px 16px'}}>Add source</button>
+        </div>
+        <p style={{fontSize:11,color:'#9b9b96',marginTop:8}}>Custom sources saved to your company account.</p>
+      </div>
+    </div>
+  );
+}
+
+function DocGen() {
+  const [docType,setDocType]=useState('SWMS');const [dept,setDept]=useState(null);
+  const [tasks,setTasks]=useState([{id:1,title:'',detail:''},{id:2,title:'',detail:''},{id:3,title:'',detail:''}]);const [tc,setTc]=useState(4);
+  const [form,setForm]=useState({company:'',abn:'',event:'',venue:'',address:'',dates:'',juris:'Queensland',siteContact:'',siteRole:'',sitePhone:'',preparedBy:'',prepRole:'',hospital:'',ppe:'',plant:'',notes:'',licences:''});
+  const [modal,setModal]=useState(false);const [prompt,setPrompt]=useState('');const [copied,setCopied]=useState(false);
+  const sf=(k,v)=>setForm(f=>({...f,[k]:v}));const dd=DEPTS.find(d=>d.id===dept);
+  const STATES=['Queensland','New South Wales','Victoria','Western Australia','South Australia','Tasmania','ACT','Northern Territory'];
+  const DOCS=[{id:'SWMS',icon:'📋'},{id:'JHA/JSA',icon:'🔍'},{id:'Risk Assessment',icon:'⚠️'},{id:'SOP',icon:'📖'},{id:'Emergency Plan',icon:'🚨'}];
+  const addT=()=>{setTasks(p=>[...p,{id:tc,title:'',detail:''}]);setTc(n=>n+1);};
+  const rmT=id=>setTasks(p=>p.filter(t=>t.id!==id));
+  const upT=(id,k,v)=>setTasks(p=>p.map(t=>t.id===id?{...t,[k]:v}:t));
+  const build=()=>{
+    if(!dept){alert('Please select a department.');return;}
+    const vt=tasks.filter(t=>t.title.trim());if(!vt.length){alert('Please add at least one task.');return;}
+    const L=['Please generate a complete '+docType+' for the following:','','**Document type:** '+docType,'**Department:** '+(dd?.name||''),'**Company:** '+(form.company||'[Not provided]')+(form.abn?' -- ABN: '+form.abn:''),'**Event:** '+(form.event||'[Not provided]'),'**Venue:** '+(form.venue||'[Not provided]')+(form.address?', '+form.address:''),'**Work dates:** '+(form.dates||'[Not provided]'),'**Jurisdiction:** '+form.juris,'**Site/OHS contact:** '+(form.siteContact||'[Not provided]')+(form.siteRole?', '+form.siteRole:'')+(form.sitePhone?', '+form.sitePhone:''),'**Prepared by:** '+(form.preparedBy||'[Not provided]')+(form.prepRole?' ('+form.prepRole+')':''),'**Nearest hospital:** '+(form.hospital||'[Not provided]'),'**PPE required:** '+(form.ppe||'As per risk assessment'),'**Plant & equipment:** '+(form.plant||'As applicable'),'**Licences required:** '+(form.licences||'Per WHS Schedule 3'),'**Site notes:** '+(form.notes||'Standard venue conditions'),'','**Work tasks:**',...vt.map((t,i)=>`${i+1}. ${t.title}${t.detail?' -- '+t.detail:''}`)];
+    setPrompt(L.join('\n'));setModal(true);
+  };
+  const copy=()=>{navigator.clipboard.writeText(prompt);setCopied(true);setTimeout(()=>setCopied(false),2000);};
+  return(
+    <div>
+      <div className="info blue"><strong>How it works:</strong> Fill in the form, click Generate -- copy the prompt and paste into Claude. Claude generates a complete OHS document with full risk tables and control measures.</div>
+      <div className="card"><div className="ctitle">Document type</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(120px,1fr))',gap:8}}>{DOCS.map(d=><button key={d.id} onClick={()=>setDocType(d.id)} style={{padding:'12px 10px 10px',border:`${docType===d.id?'2px solid #EF9F27':'1px solid rgba(0,0,0,.1)'}`,borderRadius:8,background:docType===d.id?'#FAEEDA':'#f8f7f5',cursor:'pointer',textAlign:'center'}}><div style={{fontSize:20,marginBottom:5}}>{d.icon}</div><div style={{fontSize:12,fontWeight:600,color:docType===d.id?'#BA7517':'#1a1a18'}}>{d.id}</div></button>)}</div>
+      </div>
+      <div className="card"><div className="ctitle">Step 1 -- Department & event details</div>
+        <label className="fl">Department *</label>
+        <div className="dg">{DEPTS.map(d=><button key={d.id} className={'db'+(dept===d.id?' on':'')} onClick={()=>setDept(d.id)}><span className="di">{d.icon}</span><span className="dn">{d.name}</span><span className="ds">{d.sub}</span></button>)}</div>
+        {dept&&<div className="info amber" style={{fontSize:11,marginBottom:14}}><strong>{dd?.name} hazard profile loaded.</strong> AI will focus on: {dd?.tags?.slice(0,3).join(', ')}...</div>}
+        <div className="g2"><div className="fg"><label className="fl">Company</label><input type="text" value={form.company} onChange={e=>sf('company',e.target.value)} placeholder="e.g. Stagecraft Productions Pty Ltd"/></div><div className="fg"><label className="fl">ABN (optional)</label><input type="text" value={form.abn} onChange={e=>sf('abn',e.target.value)} placeholder="e.g. 12 345 678 901"/></div></div>
+        <div className="g2"><div className="fg"><label className="fl">Event / production</label><input type="text" value={form.event} onChange={e=>sf('event',e.target.value)} placeholder="e.g. National Arena Tour 2025"/></div><div className="fg"><label className="fl">Venue</label><input type="text" value={form.venue} onChange={e=>sf('venue',e.target.value)} placeholder="e.g. Brisbane Entertainment Centre"/></div></div>
+        <div className="g3"><div className="fg"><label className="fl">Venue address</label><input type="text" value={form.address} onChange={e=>sf('address',e.target.value)} placeholder="e.g. Melaleuca Dr, Boondall QLD"/></div><div className="fg"><label className="fl">Work dates</label><input type="text" value={form.dates} onChange={e=>sf('dates',e.target.value)} placeholder="e.g. 14-16 March 2025"/></div><div className="fg"><label className="fl">Jurisdiction</label><select value={form.juris} onChange={e=>sf('juris',e.target.value)}>{STATES.map(s=><option key={s}>{s}</option>)}</select></div></div>
+        <div className="g3"><div className="fg"><label className="fl">Site / OHS contact</label><input type="text" value={form.siteContact} onChange={e=>sf('siteContact',e.target.value)} placeholder="e.g. Sarah Mitchell"/></div><div className="fg"><label className="fl">Contact role</label><input type="text" value={form.siteRole} onChange={e=>sf('siteRole',e.target.value)} placeholder="e.g. Production Manager"/></div><div className="fg"><label className="fl">Contact phone</label><input type="text" value={form.sitePhone} onChange={e=>sf('sitePhone',e.target.value)} placeholder="e.g. 0400 123 456"/></div></div>
+        <div className="g3"><div className="fg"><label className="fl">Prepared by</label><input type="text" value={form.preparedBy} onChange={e=>sf('preparedBy',e.target.value)} placeholder="Full name"/></div><div className="fg"><label className="fl">Position / role</label><input type="text" value={form.prepRole} onChange={e=>sf('prepRole',e.target.value)} placeholder="e.g. Head of Lighting"/></div><div className="fg"><label className="fl">Nearest hospital & distance</label><input type="text" value={form.hospital} onChange={e=>sf('hospital',e.target.value)} placeholder="e.g. Royal Brisbane, 2.1km"/></div></div>
+      </div>
+      <div className="card">
+        <div className="crow"><div className="ctitle">Step 2 -- Work tasks *</div><button className="sbtn" onClick={addT}>+ Add task</button></div>
+        <p style={{fontSize:12,color:'#6b6b67',marginBottom:14,lineHeight:1.65}}>List each task in order. Claude will identify hazards, rate each risk, and write full control measures for the <strong>{dd?.name||'selected'}</strong> department.</p>
+        {tasks.map((task,idx)=><div key={task.id} className="task-row">
+          <div className="task-num">{idx+1}</div>
+          <div style={{display:'flex',flexDirection:'column',gap:6}}>
+            <input type="text" value={task.title} onChange={e=>upT(task.id,'title',e.target.value)} placeholder={`Task name -- e.g. ${['Rig moving lights to truss','Set up FOH speaker system','Connect temporary power distro','Assemble stage deck panels','Fly truss to trim height'][idx%5]}`} style={{fontWeight:500}}/>
+            <textarea value={task.detail} onChange={e=>upT(task.id,'detail',e.target.value)} placeholder="Optional detail" style={{minHeight:42}}/>
+          </div>
+          {tasks.length>1&&<button onClick={()=>rmT(task.id)} style={{background:'none',border:'none',cursor:'pointer',color:'#9b9b96',fontSize:14,marginTop:4}}>x</button>}
+        </div>)}
+        <button className="sbtn" style={{width:'100%',marginTop:8,padding:10,textAlign:'center',display:'block'}} onClick={addT}>+ Add another task</button>
+      </div>
+      <div className="card"><div className="ctitle">Step 3 -- Additional requirements (optional)</div>
+        <div className="g2"><div className="fg"><label className="fl">PPE required</label><input type="text" value={form.ppe} onChange={e=>sf('ppe',e.target.value)} placeholder="e.g. Hard hat, safety glasses, hi-vis vest, steel cap boots"/></div><div className="fg"><label className="fl">Plant & equipment</label><input type="text" value={form.plant} onChange={e=>sf('plant',e.target.value)} placeholder="e.g. EWP, chain motors, distro board"/></div></div>
+        <div className="g2"><div className="fg"><label className="fl">Site conditions</label><textarea value={form.notes} onChange={e=>sf('notes',e.target.value)} placeholder="e.g. Indoor arena, shared loading dock"/></div><div className="fg"><label className="fl">Licences required</label><textarea value={form.licences} onChange={e=>sf('licences',e.target.value)} placeholder="e.g. EWP licence, Rigger -- Basic (WHS Sch. 3), First Aid"/></div></div>
+      </div>
+      <button className="pbtn" style={{marginBottom:8}} onClick={build}>Generate document -- get prompt</button>
+      <p style={{fontSize:11,color:'#9b9b96',textAlign:'center',marginBottom:20}}>Copy the prompt and paste it into Claude to generate your complete OHS document.</p>
+      {modal&&<div className="overlay" onClick={e=>e.target===e.currentTarget&&setModal(false)}>
+        <div className="modal">
+          <div style={{fontSize:15,fontWeight:600,marginBottom:6}}>Your document request is ready</div>
+          <div style={{fontSize:12,color:'#6b6b67',marginBottom:14,lineHeight:1.6}}>Copy this prompt and paste it into Claude. A complete OHS document will be generated.</div>
+          <textarea value={prompt} readOnly style={{width:'100%',height:200,padding:12,border:'1px solid rgba(0,0,0,.2)',borderRadius:8,background:'#f8f7f5',fontSize:11,fontFamily:'inherit',resize:'none',boxSizing:'border-box'}} onClick={e=>e.target.select()}/>
+          <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:12,flexWrap:'wrap'}}>
+            <button className="sbtn" onClick={()=>setModal(false)}>Close</button>
+            <button className="sbtn blue" onClick={copy}>{copied?'Copied!':'Copy to clipboard'}</button>
+            <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{padding:'9px 18px',borderRadius:8,border:'none',background:'#1a1a18',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',textDecoration:'none'}}>Open Claude</a>
+          </div>
+        </div>
+      </div>}
+    </div>
+  );
+}
+
+function IncReg() {
+  const {incidents,saveIncident}=useApp();
+  const [iType,setIType]=useState('incident');
+  const [form,setForm]=useState({date:'',time:'',event:'',venue:'',dept:'',location:'',persons:'',reportedBy:'',desc:'',injury:'',immediate:'',factors:'',actions:'',severity:'minor'});
+  const [submitting,setSubmitting]=useState(false);const [msg,setMsg]=useState('');
+  const [showP,setShowP]=useState(false);const [pText,setPText]=useState('');const [copied,setCopied]=useState(false);
+  const sf=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const DL=['Theatre','Lighting','Audio','Staging','Rigging','Site','Power','Other'];
+  const isN=['serious','critical','dangerous'].includes(form.severity);
+  const submit=async()=>{
+    if(!form.desc.trim()){setMsg('err:Please describe what happened.');return;}
+    setSubmitting(true);const {error}=await saveIncident({...form,type:iType});setSubmitting(false);
+    if(error){setMsg('err:Failed to save. Please try again.');return;}
+    setMsg('ok:Logged successfully');
+    setForm({date:'',time:'',event:'',venue:'',dept:'',location:'',persons:'',reportedBy:'',desc:'',injury:'',immediate:'',factors:'',actions:'',severity:iType==='nearmiss'?'nearmiss':'minor'});
+    setTimeout(()=>setMsg(''),3000);
+  };
+  const buildP=()=>{
+    if(!form.desc.trim()){alert('Please fill in the description first.');return;}
+    const type=iType==='nearmiss'?'Near Miss Report':'Incident Report';
+    const L=['Please generate a formal '+type+' for the following:','','**Report type:** '+type,'**Severity:** '+(SEV[form.severity]||form.severity),'**Date/time:** '+(form.date||'[Not provided]')+' '+form.time,'**Event:** '+(form.event||'[Not provided]'),'**Venue:** '+(form.venue||'[Not provided]'),'**Department:** '+(form.dept||'[Not provided]'),'**Location:** '+(form.location||'[Not provided]'),'**Persons involved:** '+(form.persons||'[Not provided]'),'**Reported by:** '+(form.reportedBy||'[Not provided]'),'','**Description:**',form.desc,'','**Injury/damage:** '+(form.injury||'None recorded'),'','**Immediate actions:**',form.immediate||'[Not recorded]','','**Contributing factors:**',form.factors||'[Not recorded]','','**Corrective actions:**',form.actions||'[Not recorded]',isN?'\n**NOTE: This incident may be NOTIFIABLE to the WHS regulator.**':'','','Please generate a complete formal '+type+' with root cause analysis, corrective action table, and WHS notification obligations. Use Australian English.'].filter(Boolean);
+    setPText(L.join('\n'));setShowP(true);
+  };
+  const copy=()=>{navigator.clipboard.writeText(pText);setCopied(true);setTimeout(()=>setCopied(false),2000);};
+  const mc=msg.startsWith('ok:')?'green':msg.startsWith('err:')?'red':'';
+  const mt=msg.replace(/^(ok|err):/,'');
+  return(
+    <div>
+      <div className="g4" style={{marginBottom:12}}>
+        <div className="sc"><div className="sl">Total logged</div><div className="sv">{incidents.length}</div></div>
+        <div className="sc"><div className="sl">Incidents</div><div className="sv bad">{incidents.filter(i=>i.type==='incident').length}</div></div>
+        <div className="sc"><div className="sl">Near misses</div><div className="sv warn">{incidents.filter(i=>i.type==='nearmiss').length}</div></div>
+        <div className="sc"><div className="sl">Actions open</div><div className="sv" style={{color:'#185FA5'}}>{incidents.filter(i=>i.actions?.trim()).length}</div></div>
+      </div>
+      {isN&&<div className="info red"><strong>Notifiable incident detected</strong> -- Phone WHSQ: 1300 362 128 (Qld) or WorkSafe WA: 1300 307 877. Do not disturb the scene.</div>}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,alignItems:'start'}}>
+        <div className="card">
+          <div className="crow"><div className="ctitle">Log an incident or near miss</div>
+            <div style={{display:'flex',gap:6}}>
+              <button className="sbtn red" onClick={()=>{setIType('incident');sf('severity','minor');}} style={{fontWeight:iType==='incident'?700:400}}>Incident</button>
+              <button className="sbtn warn" onClick={()=>{setIType('nearmiss');sf('severity','nearmiss');}} style={{fontWeight:iType==='nearmiss'?700:400}}>Near miss</button>
+            </div>
+          </div>
+          <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 12px',borderRadius:20,marginBottom:14,background:iType==='incident'?'#FCEBEB':'#FAEEDA',border:`1px solid ${iType==='incident'?'#E24B4A':'#EF9F27'}`,fontSize:12,fontWeight:600,color:iType==='incident'?'#A32D2D':'#854F0B'}}>{iType==='incident'?'Incident':'Near miss'}</div>
+          <div className="g2"><div className="fg"><label className="fl">Date</label><input type="date" value={form.date} onChange={e=>sf('date',e.target.value)}/></div><div className="fg"><label className="fl">Time</label><input type="time" value={form.time} onChange={e=>sf('time',e.target.value)}/></div></div>
+          <div className="g2"><div className="fg"><label className="fl">Event</label><input type="text" value={form.event} onChange={e=>sf('event',e.target.value)} placeholder="e.g. Jordan Davis"/></div><div className="fg"><label className="fl">Venue</label><input type="text" value={form.venue} onChange={e=>sf('venue',e.target.value)} placeholder="e.g. RAC Arena"/></div></div>
+          <div className="g2"><div className="fg"><label className="fl">Department</label><select value={form.dept} onChange={e=>sf('dept',e.target.value)}><option value="">-- Select --</option>{DL.map(d=><option key={d}>{d}</option>)}</select></div><div className="fg"><label className="fl">Location on site</label><input type="text" value={form.location} onChange={e=>sf('location',e.target.value)} placeholder="e.g. Loading dock"/></div></div>
+          <div className="g2"><div className="fg"><label className="fl">Persons involved</label><input type="text" value={form.persons} onChange={e=>sf('persons',e.target.value)} placeholder="Name(s) / role(s)"/></div><div className="fg"><label className="fl">Reported by</label><input type="text" value={form.reportedBy} onChange={e=>sf('reportedBy',e.target.value)} placeholder="Name / role"/></div></div>
+          <div className="fg"><label className="fl">Description *</label><textarea value={form.desc} onChange={e=>sf('desc',e.target.value)} style={{minHeight:80}} placeholder="Describe exactly what happened..."/></div>
+          <div className="g2"><div className="fg"><label className="fl">Injury / damage</label><textarea value={form.injury} onChange={e=>sf('injury',e.target.value)} style={{minHeight:52}} placeholder="Describe injury or write None"/></div><div className="fg"><label className="fl">Immediate actions</label><textarea value={form.immediate} onChange={e=>sf('immediate',e.target.value)} style={{minHeight:52}} placeholder="First aid given, area isolated..."/></div></div>
+          <div className="fg"><label className="fl">Contributing factors</label><textarea value={form.factors} onChange={e=>sf('factors',e.target.value)} placeholder="e.g. Fatigue, communication failure..."/></div>
+          <div className="fg"><label className="fl">Corrective actions required</label><textarea value={form.actions} onChange={e=>sf('actions',e.target.value)} placeholder="What needs to happen to prevent recurrence?"/></div>
+          <div className="fg"><label className="fl">Severity</label><select value={form.severity} onChange={e=>sf('severity',e.target.value)}><option value="nearmiss">Near miss -- no injury</option><option value="minor">Minor -- first aid only</option><option value="moderate">Moderate -- medical treatment</option><option value="serious">Serious -- hospitalisation</option><option value="critical">Critical -- death or permanent disability</option><option value="dangerous">Dangerous incident</option></select></div>
+          {mt&&<div className={'info '+mc} style={{marginBottom:10}}>{mt}</div>}
+          <div style={{display:'flex',gap:8}}>
+            <button className="pbtn" style={{flex:1,marginTop:0}} onClick={submit} disabled={submitting}>{submitting?'Saving...':'+ Log to register'}</button>
+            <button className="sbtn blue" onClick={buildP} style={{whiteSpace:'nowrap'}}>AI report</button>
+          </div>
+        </div>
+        <div className="card" style={{minHeight:400}}>
+          <div className="ctitle">Incident register</div>
+          <p style={{fontSize:11,color:'#9b9b96',marginBottom:14,lineHeight:1.55}}>All incidents saved to your company account and persist between sessions.</p>
+          {incidents.length===0?<div style={{textAlign:'center',padding:'2rem 1rem',color:'#9b9b96'}}><div style={{fontSize:28,marginBottom:8}}>📋</div><div style={{fontSize:13}}>No incidents logged yet.</div></div>:incidents.map(inc=>(
+            <div key={inc.id} className={'inc-card '+inc.type}>
+              <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',marginBottom:4}}>
+                <span className={'itag '+inc.type}>{inc.type==='incident'?'Incident':'Near miss'}</span>
+                <span style={{fontSize:10,padding:'2px 8px',borderRadius:10,fontWeight:600,background:'#f8f7f5',color:'#6b6b67',border:'1px solid rgba(0,0,0,.1)'}}>{SEV[inc.severity]||inc.severity}</span>
+                <span style={{fontSize:11,color:'#9b9b96',marginLeft:'auto'}}>{inc.date}</span>
+              </div>
+              <div style={{fontSize:12,fontWeight:600,marginBottom:3}}>{inc.desc?.slice(0,90)}{(inc.desc?.length||0)>90?'...':''}</div>
+              <div style={{fontSize:11,color:'#6b6b67'}}>{inc.dept&&inc.dept+' . '}{inc.venue&&'📍 '+inc.venue}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {showP&&<div className="overlay" onClick={e=>e.target===e.currentTarget&&setShowP(false)}>
+        <div className="modal">
+          <div style={{fontSize:15,fontWeight:600,marginBottom:6}}>AI incident report ready</div>
+          <div style={{fontSize:12,color:'#6b6b67',marginBottom:14,lineHeight:1.6}}>Copy this prompt and paste into Claude to generate a formal incident report.</div>
+          <textarea value={pText} readOnly style={{width:'100%',height:200,padding:12,border:'1px solid rgba(0,0,0,.2)',borderRadius:8,background:'#f8f7f5',fontSize:11,fontFamily:'inherit',resize:'none',boxSizing:'border-box'}} onClick={e=>e.target.select()}/>
+          <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:12,flexWrap:'wrap'}}>
+            <button className="sbtn" onClick={()=>setShowP(false)}>Close</button>
+            <button className="sbtn blue" onClick={copy}>{copied?'Copied!':'Copy to clipboard'}</button>
+            <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" style={{padding:'9px 18px',borderRadius:8,border:'none',background:'#1a1a18',color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer',textDecoration:'none'}}>Open Claude</a>
+          </div>
+        </div>
+      </div>}
+    </div>
+  );
+}
+
+function App() {
+  const [user,setUser]=useState(null);const [userMeta,setUserMeta]=useState({});const [loading,setLoading]=useState(true);
+  const [tab,setTab]=useState('dashboard');const [saveFlash,setSaveFlash]=useState(false);
+  const [incidents,setIncidents]=useState([]);const [customRegs,setCustomRegs]=useState([]);const [compHistory,setCompHistory]=useState([]);
+  useEffect(()=>{
+    db.auth.getSession().then(({data:{session}})=>{if(session?.user)handleAuth(session.user);setLoading(false);});
+    const {data:{subscription}}=db.auth.onAuthStateChange((_e,session)=>{if(session?.user&&!user)handleAuth(session.user);if(!session){setUser(null);setUserMeta({});}});
+    return()=>subscription.unsubscribe();
+  },[]);
+  const flash=()=>{setSaveFlash(true);setTimeout(()=>setSaveFlash(false),2500);};
+  const handleAuth=async(u)=>{
+    setUser(u);setUserMeta(u.user_metadata||{});const uid=u.id;
+    const [ir,rr,cr]=await Promise.all([
+      db.from('incidents').select('*').eq('user_id',uid).order('created_at',{ascending:false}),
+      db.from('regulation_sources').select('*').eq('user_id',uid).order('created_at',{ascending:true}),
+      db.from('compliance_results').select('*').eq('user_id',uid).order('created_at',{ascending:false}).limit(20),
+    ]);
+    if(ir.data)setIncidents(ir.data.map(r=>({id:r.id,type:r.type,date:r.date,time:r.time,event:r.event,venue:r.venue,dept:r.department,location:r.location,persons:r.persons,reportedBy:r.reported_by,desc:r.description,injury:r.injury,immediate:r.immediate_actions,factors:r.contributing_factors,actions:r.corrective_actions,severity:r.severity,createdAt:r.created_at})));
+    if(rr.data)setCustomRegs(rr.data);if(cr.data)setCompHistory(cr.data);
+  };
+  const saveIncident=async(entry)=>{
+    if(!user)return{error:'Not logged in'};
+    const {data,error}=await db.from('incidents').insert({user_id:user.id,company_name:userMeta.company_name||'',type:entry.type,date:entry.date,time:entry.time,event:entry.event,venue:entry.venue,department:entry.dept,location:entry.location,persons:entry.persons,reported_by:entry.reportedBy,description:entry.desc,injury:entry.injury,immediate_actions:entry.immediate,contributing_factors:entry.factors,corrective_actions:entry.actions,severity:entry.severity}).select().single();
+    if(!error&&data){setIncidents(prev=>[{id:data.id,type:data.type,date:data.date,time:data.time,event:data.event,venue:data.venue,dept:data.department,location:data.location,persons:data.persons,reportedBy:data.reported_by,desc:data.description,injury:data.injury,immediate:data.immediate_actions,factors:data.contributing_factors,actions:data.corrective_actions,severity:data.severity,createdAt:data.created_at},...prev]);flash();}
+    return{error};
+  };
+  const saveRegSource=async(source)=>{
+    if(!user)return;
+    const {data,error}=await db.from('regulation_sources').insert({user_id:user.id,name:source.name,jurisdiction:source.juris,version:source.ver,status:source.st,url:source.url||'',notes:source.note||''}).select().single();
+    if(!error&&data){setCustomRegs(prev=>[...prev,data]);flash();}
+  };
+  const saveCompliance=async(result)=>{if(!user)return;await db.from('compliance_results').insert({user_id:user.id,...result});flash();};
+  const signOut=async()=>{await db.auth.signOut();setUser(null);setUserMeta({});setIncidents([]);setCustomRegs([]);setCompHistory([]);setTab('dashboard');};
+
+  if(loading)return<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#f8f7f5'}}><div style={{textAlign:'center'}}><div style={{fontSize:32,marginBottom:12}}>🎭</div><div style={{fontSize:14,color:'#6b6b67'}}>Loading EntertainmentOHS...</div></div></div>;
+  if(!user)return<Auth onSuccess={handleAuth}/>;
+
+  const ctx={user,userMeta,incidents,customRegs,compHistory,saveFlash,saveIncident,saveRegSource,saveCompliance};
+  const tabs={dashboard:<Dashboard/>,analyse:<Analyse/>,regs:<Regs/>,templates:<DocGen/>,incidents:<IncReg/>};
+  const co=userMeta?.company_name||user?.email||'';const name=userMeta?.full_name||'';
+
+  return(
+    <Ctx.Provider value={ctx}>
+      <div className="shell">
+        <div className="topbar">
+          <div className="brand"><div className="brand-ico">🎭</div><div><div className="brand-name">EntertainmentOHS</div><div className="brand-sub">Live events compliance platform</div></div></div>
+          <div className="topbar-right">
+            <span className="vpill">v3.2 Cloud</span>
+            {co&&<span className="co-badge">{co}</span>}
+            {name&&<span style={{fontSize:12,color:'#6b6b67'}}>{name}</span>}
+            {saveFlash&&<span className="save-flash">Saved</span>}
+            <button className="btn-out" onClick={signOut}>Sign out</button>
+          </div>
+        </div>
+        <div className="nav">
+          {[['dashboard','Dashboard'],['analyse','Compliance'],['regs','Regulations'],['templates','Documents'],['incidents','Incidents']].map(([id,label])=>(
+            <button key={id} className={'nb'+(tab===id?' on':'')} onClick={()=>setTab(id)}>{label}</button>
+          ))}
+        </div>
+        {tabs[tab]}
+      </div>
+    </Ctx.Provider>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
